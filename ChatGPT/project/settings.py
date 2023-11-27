@@ -40,11 +40,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Django Rest Framework
     "rest_framework",
-    'rest_framework_simplejwt',
+    "rest_framework_simplejwt",
     "rest_framework.authtoken",
     "dj_rest_auth",
     # CORS
-    'corsheaders',
+    "corsheaders",
     # custom app
     "main",
     "accounts",
@@ -62,9 +62,11 @@ REST_FRAMEWORK = {
     ],
 }
 
+CSRF_TRUSTED_ORIGINS = ["http://43.200.125.52"]
+
 MIDDLEWARE = [
     # CORS
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     # default
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

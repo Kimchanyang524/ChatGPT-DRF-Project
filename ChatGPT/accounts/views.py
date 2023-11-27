@@ -1,68 +1,89 @@
 from django.shortcuts import render
 
 # django views
-from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import CreateView
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 
-# DRF
+# rest framework
 from rest_framework import viewsets, permissions, generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 
 # costom py
 from .models import User, UserQuiz
 from .serializers import UserSerializer
 
-# from .permissions import IsAuthorOrReadOnly
+from .permissions import IsNotAuthenticated, PostOnlyAccess
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = UserQuiz.objects.all()
+class UserCreateAPIView(viewsets.ModelViewSet):
+    """
+    인증되지 않은 사용자를 위한 회원가입 엔드포인트를 제공하는 클래스입니다.
+    """
+
+    queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsNotAuthenticated]
 
-    def perform_create(self, serializer):
-        password = self.request.data.get("password")  # type: ignore
-        if password:
-            user = serializer.save()
-            user.set_password(password)
-            user.save()
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            print(serializer.validated_data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class UserLoginView(APIView):
+    permission_classes = [PostOnlyAccess]
+
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)  # type: ignore
+
+            return Response(
+                {
+                    "message": "성공적으로 로그인되었습니다!",
+                    "access_token": access_token,
+                },
+                status=status.HTTP_200_OK,
+            )
         else:
             return Response(
-                {"error": "Password is required"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": "로그인 실패! 아이디 또는 비밀번호를 확인하세요."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
-@api_view(['POST'])
-def login(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
+class UserLogoutView(APIView):
+    permission_classes = [PostOnlyAccess]
 
-    user = authenticate(request, username=username, password=password)
-    if user:
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token) # type: ignore
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh_token")
+            return Response({"token_delete": True}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {
+                    "Error:": str(e),
+                    "token_delete": False,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-        return Response(
-            {
-                'message': "로그인 성공",
-                'access_token': access_token
-            },
-            status=status.HTTP_200_OK
-        )
-    else:
-        return Response(
-            {'message': '로그인 실패! 아이디 또는 비밀번호를 확인하세요.'},
-            status=status.HTTP_200_OK
-        )
 
-@api_view(['POST'])
-def logout(request):
-    return Response(
-        {
-            'message': "로그아웃 성공",
-            'token_delete': True
-        },
-        status=status.HTTP_200_OK)
+def csrf(request):
+    """
+    csrf token 발행
+    """
+    token = get_token(request)
+    return JsonResponse({"csrftoken": token})
