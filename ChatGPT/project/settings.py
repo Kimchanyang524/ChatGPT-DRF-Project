@@ -62,7 +62,9 @@ REST_FRAMEWORK = {
     ],
 }
 
-CSRF_TRUSTED_ORIGINS = ["http://43.200.125.52"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://43.200.125.52",
+]
 
 MIDDLEWARE = [
     # CORS
@@ -77,8 +79,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://43.200.125.52",
+    "http://13.209.138.142",
 ]
 
 ROOT_URLCONF = "project.urls"
