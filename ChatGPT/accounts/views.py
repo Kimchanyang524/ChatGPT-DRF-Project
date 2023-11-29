@@ -7,12 +7,10 @@ from django.contrib.auth import authenticate
 
 # rest framework
 from rest_framework.generics import CreateAPIView
-from rest_framework import viewsets, status
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import api_view
-import jwt
 
 # costom py
 from .models import User, UserQuiz
@@ -20,20 +18,6 @@ from .serializers import UserSerializer
 from .permissions import IsNotAuthenticated
 
 secret_key = settings.SECRET_KEY
-
-
-class UserQuizAPIView(viewsets.ModelViewSet):
-    queryset = UserQuiz.objects.all()
-
-    def post(self, request):
-        """
-        해당 유저의 퀴즈 푼 기록을 확인하는 메서드이다.
-        """
-        access = request.data.get("access")
-        payload = jwt.decode(access, secret_key, algorithms=["HS256"])
-        pk = payload.get("user_id")
-        user = get_object_or_404(User, pk=pk)
-        userquiz = UserQuiz.objects.filter(user_id=user).first()
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -64,9 +48,8 @@ class UserCreateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             print(serializer.validated_data)
-            serializer.save()
-            print(type(serializer))
-            # UserQuiz.objects.create(user_id="")
+            user = serializer.save()
+            UserQuiz.objects.create(user_id=user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

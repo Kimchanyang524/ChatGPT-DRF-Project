@@ -65,24 +65,18 @@ class ChatBotAPIView(APIView):
         퀴즈 푼 기록을 남기는 기능
         """
         today = datetime.now().date()
-        access = request.data.get("access")
         question = request.data.get("question")
         answer = request.data.get("answer")
         correct = request.data.get("correct")
-        print(question)
-        print(answer)
-        payload = jwt.decode(access, secret_key, algorithms=["HS256"])
-        pk = payload.get("user_id")
-        user = get_object_or_404(User, pk=pk)
         Quiz.objects.create(
-            user_id=user,
+            user_id=request.user,
             prompt=question,
             response=answer,
             correct=correct,
-        ).save()
-        userquiz = UserQuiz.objects.filter(user_id=user).first()
+        )
+        userquiz = UserQuiz.objects.filter(user_id=request.user).first()
 
-        # 퀴즈 데이터가 없으면 신규 데이터를 삽입하고, 있으면 갱신한다.
+        # 퀴즈 데이터가 있으면 갱신한다.
         if userquiz:
             if userquiz.recently_quiz == today:
                 userquiz.today_quiz += 1
