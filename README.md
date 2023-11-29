@@ -12,3 +12,10 @@
 ![image](https://github.com/Kimchanyang524/ChatGPT-DRF-Project/assets/105031421/b63b0405-9293-43c6-a678-e77e8026aa23)
 ![image](https://github.com/Kimchanyang524/ChatGPT-DRF-Project/assets/105031421/dc58b90b-952d-420e-9f1b-329052bec97c)
 
+기능쪽 설명할 내용
+- 자바스크립트 html 임포트
+- 베이스 자바스크립트
+
+오류픽스 사용할 내용
+- 자바스크립트 리로드
+- 챗봇으로 정답여부를 판별받으려고했는데 이전 정보를 기억 못하는것 같았다.

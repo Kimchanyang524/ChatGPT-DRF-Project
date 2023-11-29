@@ -5,5 +5,6 @@ from . import views
 router = DefaultRouter()
 
 urlpatterns = [
-    path("list/", views.ChatBotAPIView.as_view()),
+    path("list/", views.QuizAPIView.as_view()),
+    path("chat/", views.ChatBotAPIView.as_view()),
 ]

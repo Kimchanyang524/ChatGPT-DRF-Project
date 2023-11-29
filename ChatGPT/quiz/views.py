@@ -93,3 +93,10 @@ class ChatBotAPIView(APIView):
             if userquiz.today_quiz >= 5:
                 return Response({"redirect": True})
         return Response({})
+
+
+class QuizAPIView(APIView):
+    def get(self, request):
+        quiz = Quiz.objects.filter(user_id=request.user)
+        serializer = QuizSerializer(quiz, many=True)
+        return Response({"serializer": serializer.data})

@@ -13,4 +13,5 @@ class QuizSerializer(ModelSerializer):
         fields = [
             "prompt",
             "response",
+            "correct",
         ]
