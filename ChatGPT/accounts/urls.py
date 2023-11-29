@@ -1,14 +1,14 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import token_refresh, token_verify
 from . import views
 
 router = DefaultRouter()
-router.register("register", views.UserCreateAPIView)
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("login/", views.UserLoginView.as_view()),
-    path("logout/", views.UserLogoutView.as_view()),
-    path("csrf/", views.csrf, name="csrf"),
-    # path("signup/", views.logout),
+    path("auth/", views.AuthAPIView.as_view()),
+    path("register/", views.UserCreateAPIView.as_view()),
+    path("refresh_token/", token_refresh, name="token_refresh"),
+    path("verify/", token_verify, name="token_verify"),
 ]

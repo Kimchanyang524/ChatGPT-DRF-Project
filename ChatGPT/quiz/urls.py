@@ -3,9 +3,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-# router.register("quiz", views.ChatBotAPIView)
 
 urlpatterns = [
-    # path("", include(router.urls)),
-    path("list", views.APIView.as_view()),
+    path("list/", views.ChatBotAPIView.as_view()),
 ]

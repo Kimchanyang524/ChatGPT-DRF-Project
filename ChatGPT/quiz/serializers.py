@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import User
+from .models import Quiz
 from django.contrib.auth import get_user_model
 
 
@@ -9,14 +9,8 @@ class QuizSerializer(ModelSerializer):
     """
 
     class Meta:
-        model = User
+        model = Quiz
         fields = [
             "prompt",
             "response",
         ]
-
-    def create(self, validated_data):
-        user = super().create(validated_data)
-        user.set_password(validated_data["password"])
-        user.save()
-        return user

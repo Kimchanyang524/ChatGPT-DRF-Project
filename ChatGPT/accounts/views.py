@@ -1,25 +1,47 @@
-from django.shortcuts import render
+# django base
+from django.shortcuts import render, get_object_or_404
+from django.conf import settings
 
 # django views
-from django.contrib.auth import authenticate, login, logout
-from django.http import JsonResponse
-from django.middleware.csrf import get_token
+from django.contrib.auth import authenticate
 
 # rest framework
+from rest_framework.generics import CreateAPIView
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.decorators import api_view
+import jwt
 
 # costom py
 from .models import User, UserQuiz
 from .serializers import UserSerializer
-from .permissions import IsNotAuthenticated, PostOnlyAccess
+from .permissions import IsNotAuthenticated
+
+secret_key = settings.SECRET_KEY
 
 
-class UserCreateAPIView(viewsets.ModelViewSet):
+class UserQuizAPIView(viewsets.ModelViewSet):
+    queryset = UserQuiz.objects.all()
+
+    def post(self, request):
+        """
+        해당 유저의 퀴즈 푼 기록을 확인하는 메서드이다.
+        """
+        access = request.data.get("access")
+        payload = jwt.decode(access, secret_key, algorithms=["HS256"])
+        pk = payload.get("user_id")
+        user = get_object_or_404(User, pk=pk)
+        userquiz = UserQuiz.objects.filter(user_id=user).first()
+
+
+class UserCreateAPIView(CreateAPIView):
     """
-    인증되지 않은 사용자를 위한 회원가입 엔드포인트를 제공하는 클래스입니다.
+    회원가입을하는 View이다.
+
+    function:
+    - create: 회원가입
     """
 
     queryset = User.objects.all()
@@ -27,59 +49,83 @@ class UserCreateAPIView(viewsets.ModelViewSet):
     permission_classes = [IsNotAuthenticated]
 
     def create(self, request):
+        """
+        회원가입을하는 메서드이다.
+
+        args:
+        - username: 아이디
+        - password: 비밀번호
+
+        return:
+        - access: access token (JWT)
+        - refresh: refresh token (JWT)
+        """
+
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             print(serializer.validated_data)
             serializer.save()
+            print(type(serializer))
+            # UserQuiz.objects.create(user_id="")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class UserLoginView(APIView):
-    permission_classes = [PostOnlyAccess]
+class AuthAPIView(APIView):
+    """
+    유저 정보를 관리하는 View이다.
+
+    function:
+    - post: 로그인
+    - delete: 로그아웃
+    """
 
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
+        """
+        로그인하는 메서드이다.
 
-        user = authenticate(request, username=username, password=password)
+        args:
+        - username: 아이디
+        - password: 비밀번호
+
+        return:
+        - access: access token (JWT)
+        - refresh: refresh token (JWT)
+
+        error:
+        - HTTP 400 Bad Request
+        """
+        # 유저 인증
+        user = authenticate(
+            request,
+            username=request.data.get("username"),
+            password=request.data.get("password"),
+        )
+        # 이미 회원가입 된 유저일 때
         if user:
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)  # type: ignore
-
-            return Response(
+            serializer = UserSerializer(user)
+            # jwt 토큰 접근
+            token = RefreshToken.for_user(user)
+            refresh_token = str(token)
+            access_token = str(token.access_token)
+            res = Response(
                 {
-                    "message": "성공적으로 로그인되었습니다!",
-                    "access_token": access_token,
+                    "access": access_token,
+                    "refresh": refresh_token,
                 },
                 status=status.HTTP_200_OK,
             )
+            return res
         else:
-            return Response(
-                {"message": "로그인 실패! 아이디 또는 비밀번호를 확인하세요."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        """
+        로그아웃하는 메서드이다.
 
-class UserLogoutView(APIView):
-    permission_classes = [PostOnlyAccess]
-
-    def post(self, request):
-        try:
-            refresh_token = request.data.get("refresh_token")
-            return Response({"token_delete": True}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {
-                    "Error:": str(e),
-                    "token_delete": False,
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-
-def csrf(request):
-    """
-    csrf token 발행
-    """
-    token = get_token(request)
-    return JsonResponse({"csrftoken": token})
+        return:
+        - message: Logout success
+        """
+        response = Response(
+            {"message": "Logout success"}, status=status.HTTP_202_ACCEPTED
+        )
+        return response
