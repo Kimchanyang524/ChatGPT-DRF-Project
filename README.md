@@ -1,5 +1,7 @@
 # ChatGPT-DRF-Project
+FE: [https://github.com/Kimchanyang524/ChatGPT-DRF-FE](https://github.com/Kimchanyang524/ChatGPT-DRF-FE)
 
+## 목차
 - [ChatGPT-DRF-Project](#chatgpt-drf-project)
   * [1. 목표와 기능](#1-------)
   * [2. 개발 기술 및 환경](#2-----------)
