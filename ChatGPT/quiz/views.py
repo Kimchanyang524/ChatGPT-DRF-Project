@@ -33,13 +33,27 @@ secret_key = settings.SECRET_KEY
 
 
 class ChatBotAPIView(APIView):
+    """
+    챗봇 기능이 담긴 View이다.
+
+    function:
+    - get: 챗봇 요청
+    - post: 퀴즈 질문과 답변, 정답여부를 데이터베이스에 저장
+    """
+
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
-    permission_classes = [IsNotAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         """
         퀴즈 문제를 출제하는 기능
+
+        header:
+        - Authorization: Bearer token
+
+        return:
+        - content: ChatGPT의 답변
         """
         client = openai.OpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
@@ -63,6 +77,21 @@ class ChatBotAPIView(APIView):
     def post(self, request):
         """
         퀴즈 푼 기록을 남기는 기능
+
+        header:
+        - Authorization: Bearer token
+
+        args:
+        - question: 문제
+        - answer: 사용자의 답변
+        - correct: 정답여부
+
+        return:
+        - redirect: True
+        - None
+
+        error:
+        - HTTP 400 Bad Request
         """
         today = datetime.now().date()
         question = request.data.get("question")
@@ -75,6 +104,8 @@ class ChatBotAPIView(APIView):
             correct=correct,
         )
         userquiz = UserQuiz.objects.filter(user_id=request.user).first()
+        print(1)
+        print(userquiz)
 
         # 퀴즈 데이터가 있으면 갱신한다.
         if userquiz:
@@ -86,11 +117,28 @@ class ChatBotAPIView(APIView):
             userquiz.save()
             if userquiz.today_quiz >= 5:
                 return Response({"redirect": True})
-        return Response({})
+            return Response({})
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuizAPIView(APIView):
+    """
+    역대 퀴즈 기록을 출력하는 클래스이다
+
+    function:
+    - get: 전체 기록 출력
+    """
+
     def get(self, request):
+        """
+        로그인한 유저의 전체 퀴즈 기록을 출력하는 기능이다.
+
+        header:
+        - Authorization: Bearer token
+
+        return:
+        - serializer: 전체 퀴즈 기록이 JSON으로 전송된다.
+        """
         quiz = Quiz.objects.filter(user_id=request.user)
         serializer = QuizSerializer(quiz, many=True)
         return Response({"serializer": serializer.data})
