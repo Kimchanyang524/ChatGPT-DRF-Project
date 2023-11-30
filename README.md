@@ -133,31 +133,62 @@ FE: [https://github.com/Kimchanyang524/ChatGPT-DRF-FE](https://github.com/Kimcha
 |'verify/'|token_verify|POST|
 
 ### 3.3 와이어프레임
-    <img src="/img/WireFrame-main.png">
-    <img src="/img/WireFrame-login.png">
-    <img src="/img/WireFrame-signup.png">
-    <img src="/img/WireFrame-quiz.png">
-    <img src="/img/WireFrame-quizlist.png">
+<img src="/img/WireFrame-main.png">
+<img src="/img/WireFrame-login.png">
+<img src="/img/WireFrame-signup.png">
+<img src="/img/WireFrame-quiz.png">
+<img src="/img/WireFrame-quizlist.png">
 
 ### 3.4 개발 일정(WBS)
-    <img src="/img/WBS.png">
+<img src="/img/WBS.png">
 
 ### 3.5 ERD
-    <img src="/img/ERD.png">
+<img src="/img/ERD.png">
 
 ## 4. UI
-    <img src="/img/main.png">
-    <img src="/img/register.gif">
-    <img src="/img/login.gif">
-    <img src="/img/logout.gif">
-    <img src="/img/quiz.gif">
-    <img src="/img/quizlist.png">
+<img src="/img/main.png">
+<img src="/img/register.gif">
+<img src="/img/login.gif">
+<img src="/img/logout.gif">
+<img src="/img/quiz.gif">
+<img src="/img/quizlist.png">
 
 ## 5. 기능
 
 - 회원가입 및 로그인 기능
 - 하루 5회 랜덤한 영어퀴즈
 - 자신의 역대 기록
+
+```mermaid
+    sequenceDiagram
+    actor A as client
+    participant B as Web
+    participant C as server
+    A->>+B: 로그인을 하고싶어
+    B->>+A: 로그인 정보 요구
+    A->>+C: id pw 전달
+    C->>+B: access token 전달
+    B->>+A: 로그인 성공
+```
+
+```mermaid
+    sequenceDiagram
+    actor A as client
+    participant B as Web
+    participant C as server
+    A->>+B: 퀴즈를 풀고 싶어
+    B->>+C: access token 전달
+    alt 퀴즈 횟수 5회 이상
+    C->>+B: False
+    B->>+A: 메인화면으로
+    else 퀴즈 횟수 5회 미만
+    C->>+B: 챗봇 답변 전달
+    B->>+A: 퀴즈 문제 전달
+    A->>+B: 퀴즈 답변 전달
+    B->>+A: 정답여부 전달
+    B->>+C: 문제와 답변, 정답 여부 전송
+    end
+```
 
 ## 6. 개발 이슈
 
