@@ -167,8 +167,13 @@ FE: [https://github.com/Kimchanyang524/ChatGPT-DRF-FE](https://github.com/Kimcha
     A->>+B: 로그인을 하고싶어
     B->>+A: 로그인 정보 요구
     A->>+C: id pw 전달
+    alt 로그인 정보 있을시
     C->>+B: access token 전달
     B->>+A: 로그인 성공
+    else 정보 없을시
+    C->>+B: False
+    B->>+A: 로그인 실패
+    end
 ```
 
 ```mermaid
