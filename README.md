@@ -58,6 +58,7 @@ FE: [https://github.com/Kimchanyang524/ChatGPT-DRF-FE](https://github.com/Kimcha
 
 #### FE
 
+```
 📦ChatGPT-DRF-FE
  ┣ 📂.git
  ┣ 📂CSS
@@ -86,6 +87,7 @@ FE: [https://github.com/Kimchanyang524/ChatGPT-DRF-FE](https://github.com/Kimcha
  ┃ ┣ 📜register.js
  ┃ ┗ 📜token.js
  ┗ 📜README.md
+```
 
 #### BE
 
