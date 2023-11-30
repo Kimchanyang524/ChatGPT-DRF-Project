@@ -58,6 +58,34 @@ FE: [https://github.com/Kimchanyang524/ChatGPT-DRF-FE](https://github.com/Kimcha
 
 #### FE
 
+📦ChatGPT-DRF-FE
+ ┣ 📂.git
+ ┣ 📂CSS
+ ┃ ┣ 📜footer.css
+ ┃ ┗ 📜quiz.css
+ ┣ 📂HTML
+ ┃ ┣ 📂include
+ ┃ ┃ ┣ 📜footer.html
+ ┃ ┃ ┗ 📜header.html
+ ┃ ┣ 📜404.html
+ ┃ ┣ 📜login.html
+ ┃ ┣ 📜main.html
+ ┃ ┣ 📜quiz.html
+ ┃ ┣ 📜quizlist.html
+ ┃ ┗ 📜register.html
+ ┣ 📂Image
+ ┣ 📂JavaScript
+ ┃ ┣ 📜base.js
+ ┃ ┣ 📜header.js
+ ┃ ┣ 📜include.js
+ ┃ ┣ 📜login.js
+ ┃ ┣ 📜logout.js
+ ┃ ┣ 📜main.js
+ ┃ ┣ 📜quiz.js
+ ┃ ┣ 📜quizlist.js
+ ┃ ┣ 📜register.js
+ ┃ ┗ 📜token.js
+ ┗ 📜README.md
 
 #### BE
 
@@ -131,6 +159,12 @@ FE: [https://github.com/Kimchanyang524/ChatGPT-DRF-FE](https://github.com/Kimcha
 |'register/'|UserCreateAPIView|CREATE|
 |'refresh_token/'|token_refresh|POST|
 |'verify/'|token_verify|POST|
+
+|app: quiz  |View  |Method   |
+|:-------------|:--------------|:------------|
+|'quiz/'|ChatBotAPIView|GET|
+|'quiz/'|ChatBotAPIView|POST|
+|'quiz/list'|QuizAPIView|GET|
 
 ### 3.3 와이어프레임
 <img src="/img/WireFrame-main.png">
